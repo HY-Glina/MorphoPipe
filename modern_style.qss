@@ -1,0 +1,284 @@
+/* 学术工程软件专业样式 - COMSOL/SolidWorks风格 */
+/* 白色基底 + 加粗灰色边框 + 无色彩干扰 */
+
+/* ===== 全局重置 ===== */
+* {
+    font-family: "Segoe UI", "Arial", sans-serif;
+    font-size: 9pt;
+    color: #333333;
+}
+
+QMainWindow {
+    background-color: #F5F5F5;
+}
+
+/* ===== 核心改进：分组框样式 ===== */
+QGroupBox {
+    border: 3px solid #E0E0E0;  /* 加粗浅灰边框 */
+    border-radius: 4px;
+    margin-top: 12px;
+    padding-top: 8px;  /* 减少顶部内边距 */
+    background-color: white;
+    font-weight: bold;
+    color: #333333;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;  /* 标题居中 */
+    padding: 0px 12px;  /* 增加左右内边距创建空白区域 */
+    background-color: #D0E3FF;  /* 白色背景覆盖边框 */
+    color: #333333;
+    font-weight: bold;
+    /* 标题区域不显示边框 */
+    border: none;
+}
+
+/* ===== 扁平化按钮系统 ===== */
+
+/* 主要按钮 - 极简蓝色边框 */
+QPushButton.primary {
+    background-color: white;
+    border: 1px solid #1E90FF;
+    border-radius: 3px;
+    color: #1E90FF;
+    font-weight: normal;
+    padding: 6px 12px;
+    min-height: 28px;
+}
+
+QPushButton.primary:hover {
+    background-color: #F8FBFF;
+    border-color: #1C86EE;
+}
+
+QPushButton.primary:pressed {
+    background-color: #F0F8FF;
+}
+
+QPushButton.primary:disabled {
+    background-color: #F9F9F9;
+    color: #AAAAAA;
+    border-color: #DDDDDD;
+}
+
+/* 次要按钮 - 灰色边框 */
+QPushButton.secondary {
+    background-color: white;
+    border: 1px solid #C0C0C0;
+    border-radius: 3px;
+    color: #666666;
+    padding: 5px 10px;
+    min-height: 26px;
+}
+
+QPushButton.secondary:hover {
+    background-color: #F8F8F8;
+    border-color: #A0A0A0;
+}
+
+QPushButton.secondary:pressed {
+    background-color: #F0F0F0;
+}
+
+QPushButton.secondary:disabled {
+    background-color: #F9F9F9;
+    color: #BBBBBB;
+    border-color: #E0E0E0;
+}
+
+/* 特殊：撤销按钮 */
+QPushButton#undo_btn {
+    background-color: white;
+    border: 1px solid #1E90FF;
+    border-radius: 20px;
+    color: #1E90FF;
+    font-size: 16px;
+    min-width: 32px;
+    min-height: 32px;
+    max-width: 32px;
+    max-height: 32px;
+    qproperty-text: "↶";
+}
+
+QPushButton#undo_btn:hover {
+    background-color: #F8FBFF;
+}
+
+QPushButton#undo_btn:disabled {
+    background-color: #F9F9F9;
+    color: #CCCCCC;
+    border-color: #E0E0E0;
+}
+
+/* ===== 输入控件 - 工程化样式 ===== */
+QLineEdit, QComboBox {
+    border: 1px solid #C8C8C8;
+    border-radius: 2px;
+    padding: 4px 6px;
+    background-color: white;
+    min-height: 24px;
+}
+
+QLineEdit:focus, QComboBox:focus {
+    border-color: #1E90FF;
+    outline: none;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 18px;
+}
+
+QComboBox::down-arrow {
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-top: 4px solid #666666;
+    width: 0px;
+    height: 0px;
+}
+
+/* ===== 单选按钮 - 简洁样式 ===== */
+QRadioButton {
+    spacing: 6px;
+    color: #333333;
+}
+
+QRadioButton::indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    border: 1px solid #A0A0A0;
+    background-color: white;
+}
+
+QRadioButton::indicator:checked {
+    border-color: #1E90FF;
+    background-color: #1E90FF;
+}
+
+/* ===== 布局优化 - 增加留白 ===== */
+QWidget {
+    background-color: #F5F5F5;
+}
+
+QVBoxLayout, QHBoxLayout, QFormLayout {
+    spacing: 10px;
+    margin: 12px;
+}
+
+QFormLayout {
+    margin-top: 8px;
+}
+
+/* ===== 菜单和下拉列表 ===== */
+QComboBox QAbstractItemView {
+    border: 1px solid #D0D0D0;
+    border-radius: 2px;
+    background-color: white;
+    selection-background-color: #1E90FF;
+    selection-color: white;
+}
+
+QMenu {
+    background-color: white;
+    border: 1px solid #D0D0D0;
+    border-radius: 2px;
+}
+
+QMenu::item {
+    padding: 4px 16px;
+}
+
+QMenu::item:selected {
+    background-color: #1E90FF;
+    color: white;
+}
+
+/* ===== 滚动条 - 简约样式 ===== */
+QScrollBar:vertical {
+    border: none;
+    background-color: #F0F0F0;
+    width: 10px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #C8C8C8;
+    border-radius: 4px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #A8A8A8;
+}
+
+/* ===== 状态标签 ===== */
+QLabel.status {
+    color: #666666;
+    font-style: italic;
+    background-color: transparent;
+    border: none;
+    padding: 2px 4px;
+}
+
+/* ===== 功能区域统一样式 ===== */
+QGroupBox[title="1. Base Pattern"],
+QGroupBox[title="2. Periodic Deformation"], 
+QGroupBox[title="3. Local Deformation"],
+QGroupBox[title="4. Deformation Periodization"],
+QGroupBox[title="Zoom View"],
+QGroupBox[title="Operation Log"] {
+    border: 3px solid #E0E0E0;  /* 统一的加粗灰色边框 */
+    background-color: white;
+}
+
+/* ===== 画布区域 ===== */
+QWidget#canvas_widget {
+    background-color: white;
+    border: 1px solid #D0D0D0;
+    border-radius: 2px;
+}
+
+/* ===== 弱化所有交互效果 ===== */
+QPushButton:hover, QComboBox:hover, QRadioButton:hover {
+    /* 轻微的背景色变化 */
+}
+
+QPushButton:pressed, QComboBox:pressed {
+    /* 轻微的按下效果 */
+}
+
+/* ===== 专业工具提示 ===== */
+QToolTip {
+    background-color: #2C2C2C;
+    color: white;
+    border: 1px solid #404040;
+    border-radius: 2px;
+    padding: 4px 8px;
+}
+
+/* ===== 日志区域特殊样式 ===== */
+QGroupBox[title="Operation Log"] {
+    border: 3px solid #E0E0E0;
+    background-color: white;
+}
+
+QGroupBox[title="Operation Log"]::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 0px 12px;
+    background-color: #D0E3FF;
+    color: #333333;
+    font-weight: bold;
+}
+
+/* ===== 文本编辑区域 ===== */
+QTextEdit {
+    border: 1px solid #D0D0D0;
+    border-radius: 2px;
+    background-color: white;
+    padding: 4px;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 9pt;
+}
