@@ -20,8 +20,8 @@ class GCodeExporter:
             with open(output_file, 'w') as f:
                 # 直接写入坐标，不添加注释
                 for x, y in unfolded_points:
-                    f.write(f"{x:.2f}, {y:.2f}\n")
-            
+                    f.write(f"G1 X{x:.2f} Y{y:.2f} F180\n")
+                    # f.write(f"{x:.2f}, {y:.2f}\n")
             print(f"Unfolded path coordinates exported to {output_file}")
             return True
             

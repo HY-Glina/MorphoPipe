@@ -1,5 +1,5 @@
 import numpy as np
-
+import math 
 # 周期性变形函数模板定义
 PERIODIC_FUNCTION_TEMPLATES = {
     1: {
@@ -204,21 +204,41 @@ def deform_type4_periodic(base_points, params):
             
             deformed_points.append((round(x_def, 3), round(y_def, 3)))
     
-    # 自定义函数模式
-    else:
+        # 自定义函数模式
+    else:  # 自定义函数模式
         x_expr = params["x_def_expr"]
         y_expr = params["y_def_expr"]
-        custom_params = params.get("custom_params", {})
         
-        allowed_vars = {"x": 0, "y": 0, "omega": omega, "np": np}
-        allowed_vars.update(custom_params)
+        # 构建安全求值环境
+        allowed_vars = {
+            "x": 0, "y": 0,
+            "omega": omega,
+            "pi": math.pi,
+            "e": math.e,
+            "sin": math.sin,
+            "cos": math.cos,
+            "tan": math.tan,
+            "asin": math.asin,
+            "acos": math.acos,
+            "atan": math.atan,
+            "sinh": math.sinh,
+            "cosh": math.cosh,
+            "tanh": math.tanh,
+            "exp": math.exp,
+            "log": math.log,
+            "log10": math.log10,
+            "sqrt": math.sqrt,
+            "abs": abs,
+            "pow": pow
+        }
         deformed_points = []
         
         for x, y in base_points:
             allowed_vars["x"], allowed_vars["y"] = x, y
             try:
-                x_def_raw = eval(x_expr, {"__builtins__": None}, allowed_vars)
-                y_def_raw = eval(y_expr, {"__builtins__": None}, allowed_vars)
+                # 使用 eval 计算表达式
+                x_def_raw = eval(x_expr, {"__builtins__": {}}, allowed_vars)
+                y_def_raw = eval(y_expr, {"__builtins__": {}}, allowed_vars)
             except Exception as e:
                 raise ValueError(f"Custom function error: {str(e)}")
             

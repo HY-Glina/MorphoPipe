@@ -283,32 +283,32 @@ class ZoomWindow(QMainWindow):
                 if vertices and vertices[0] != vertices[-1]:
                     vertices = vertices + [vertices[0]]
                 patch = patches.Polygon(vertices, fill=False,
-                                        edgecolor=color,          # ✅ 使用参数color
+                                        edgecolor=color,          
                                         linestyle='--', linewidth=1.5)
-                ax.add_patch(patch)                               # ✅ 使用ax
+                ax.add_patch(patch)                             
             else:
                 width, height = region['width'], region['height']
                 patch = patches.Rectangle(
                     (centroid[0] - width/2, centroid[1] - height/2),
                     width, height, angle=region['angle'],
-                    fill=False, edgecolor=color,                  # ✅ 使用参数color
+                    fill=False, edgecolor=color,                
                     linestyle='--', linewidth=1.5
                 )
-                ax.add_patch(patch)                               # ✅ 使用ax
+                ax.add_patch(patch)                             
         elif reg_type == 'ellipse':
             major, minor = region['major_axis'], region['minor_axis']
             patch = patches.Ellipse(
                 centroid, major, minor, angle=region['angle'],
-                fill=False, edgecolor=color,                      # ✅ 使用参数color
+                fill=False, edgecolor=color,                      
                 linestyle='--', linewidth=1.5
             )
-            ax.add_patch(patch)                                   # ✅ 使用ax
+            ax.add_patch(patch)                                 
         elif reg_type == 'custom':
             vertices = region['vertices']
             patch = patches.Polygon(vertices, fill=False, 
-                                edgecolor=color,                  # ✅ 使用参数color
+                                edgecolor=color,                 
                                 linestyle='--', linewidth=1.5)
-            ax.add_patch(patch)                                   # ✅ 使用ax
+            ax.add_patch(patch)                                  
         
     def activate_zoom(self):
         """激活区域放大"""
@@ -1259,7 +1259,7 @@ class BasePatternDialogEx(QDialog):
 
 class PeriodicFunctionDialog(QDialog):
     """周期性变形参数对话框"""
-    def __init__(self, deform_dimension, mode, parent=None):  # 添加mode参数
+    def __init__(self, deform_dimension, mode, parent=None, default_x_expr=None, default_y_expr=None):
         super().__init__(parent)
         self.deform_dimension = deform_dimension
         self.mode = mode  # "preset" 或 "custom"
@@ -1298,7 +1298,13 @@ class PeriodicFunctionDialog(QDialog):
         
         self.mode_group.setLayout(mode_layout)
         self.main_layout.addWidget(self.mode_group)
-        
+        # 根据传入的 mode 设置选中的单选按钮
+        if self.mode == "preset":
+            self.preset_radio.setChecked(True)
+        else:  # custom
+            self.custom_radio.setChecked(True)
+        # 隐藏整个模式选择分组框
+        self.mode_group.setVisible(False)
         # 周期参数控件
         self.period_n_input = QLineEdit()
         self.period_n_input.setPlaceholderText("Enter number of periods")
@@ -1344,44 +1350,39 @@ class PeriodicFunctionDialog(QDialog):
         self.note_label.hide()
         
         self.main_layout.addWidget(self.preset_widget)
-        
-        # 自定义函数区域
+
+        # 自定义函数区域（简化版，无参数输入）
         self.custom_widget = QWidget()
         self.custom_widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
         custom_layout = QVBoxLayout(self.custom_widget)
         custom_layout.setContentsMargins(0, 0, 0, 0)
-        
-        self.x_expr_input = QLineEdit("x")
-        self.y_expr_input = QLineEdit("y")
-        
+
         custom_layout.addWidget(QLabel("X deformation expression:"))
+        self.x_expr_input = QLineEdit(default_x_expr if default_x_expr else "x + 0.5*sin(0.4*x)")
         custom_layout.addWidget(self.x_expr_input)
+        
         custom_layout.addWidget(QLabel("Y deformation expression:"))
+        self.y_expr_input = QLineEdit(default_y_expr if default_y_expr else "y")
         custom_layout.addWidget(self.y_expr_input)
-        custom_layout.addWidget(QLabel("Example: x + A*sin(B*x)"))
-        
-        self.custom_params_frame = QFrame()
-        self.custom_params_layout = QFormLayout(self.custom_params_frame)
-        custom_layout.addWidget(QLabel("Custom parameters (A, B, etc.):"))
-        custom_layout.addWidget(self.custom_params_frame)
-        
-        # 添加自定义参数按钮
-        self.add_param_btn = QPushButton("Add Parameter")
-        self.add_param_btn.clicked.connect(self.add_custom_param)
-        custom_layout.addWidget(self.add_param_btn)
-        
-        # 自定义模式周期参数
+
+        # 提示信息
+        hint_label = QLabel("Supported: x, y, sin, cos, tan, exp, log, sqrt, pi, +, -, *, /, **")
+        hint_label.setWordWrap(True)
+        hint_label.setStyleSheet("color: gray; font-size: 9pt;")
+        custom_layout.addWidget(hint_label)
+
+        # 周期参数（保留）
         self.custom_period_n_input = QLineEdit("2")
-        self.custom_period_dir_label = QLabel("circumference")  # 新增：固定显示标签
+        self.custom_period_dir_label = QLabel("circumference")
 
         custom_period_frame = QFrame()
         custom_period_layout = QFormLayout(custom_period_frame)
         custom_period_layout.addRow("Number of periods:", self.custom_period_n_input)
-        custom_period_layout.addRow("Period direction:", self.custom_period_dir_label)  # 修改：使用标签替代下拉框
+        custom_period_layout.addRow("Period direction:", self.custom_period_dir_label)
 
         custom_layout.addWidget(QLabel("Period parameters:"))
         custom_layout.addWidget(custom_period_frame)
-        
+
         self.main_layout.addWidget(self.custom_widget)
         
         # 生成按钮
@@ -1393,7 +1394,6 @@ class PeriodicFunctionDialog(QDialog):
         self.update_mode()
         self.update_preset_params()
         self.custom_param_count = 0
-        self.add_custom_param()
         self.init_ui_by_mode()  # 调用新的初始化方法
     def update_mode(self):
         """更新模式显示"""
@@ -1447,26 +1447,6 @@ class PeriodicFunctionDialog(QDialog):
                 self.param_inputs[param_name] = input_box
                 self.params_layout.addRow(f"{param_name}:", input_box)
     
-    def add_custom_param(self):
-        """添加自定义参数输入框"""
-        # 获取当前已有参数数量
-        current_count = self.custom_params_layout.rowCount()
-        
-        # 根据当前数量确定参数名称
-        if current_count == 0:
-            param_name = "A"
-        elif current_count == 1:
-            param_name = "B"
-        elif current_count == 2:
-            param_name = "C"
-        else:
-            param_name = f"param{current_count}"
-        
-        name_input = QLineEdit(param_name)
-        value_input = QLineEdit("0.5")
-        
-        self.custom_params_layout.addRow(name_input, value_input)
-    
     def get_params(self):
         """获取用户输入的参数"""
         try:
@@ -1502,15 +1482,6 @@ class PeriodicFunctionDialog(QDialog):
                 params["x_def_expr"] = self.x_expr_input.text()
                 params["y_def_expr"] = self.y_expr_input.text()
 
-                custom_params = {}
-                for i in range(self.custom_params_layout.rowCount()):
-                    name_widget = self.custom_params_layout.itemAt(i, QFormLayout.LabelRole).widget()
-                    value_widget = self.custom_params_layout.itemAt(i, QFormLayout.FieldRole).widget()
-                    if isinstance(name_widget, QLineEdit) and isinstance(value_widget, QLineEdit):
-                        name = name_widget.text().strip()
-                        if name:
-                            custom_params[name] = float(value_widget.text())
-                params["custom_params"] = custom_params
 
             return params
         except ValueError as e:
@@ -1521,20 +1492,16 @@ class PeriodicFunctionDialog(QDialog):
         """根据模式初始化界面"""
         if self.mode == "preset":
             self.preset_radio.setChecked(True)
-            self.custom_radio.setEnabled(False)  # 禁用自定义选项
+            self.custom_radio.setEnabled(False)
         else:  # custom mode
             self.custom_radio.setChecked(True)
-            self.preset_radio.setEnabled(False)  # 禁用预设选项
-        
-        # 隐藏模式选择区域，因为现在通过按钮区分
-        self.mode_group.setVisible(False)
+            self.preset_radio.setEnabled(False)
         
         self.update_mode()
         if self.mode == "preset":
             self.update_preset_params()
         self.custom_param_count = 0
-        if self.mode == "custom":
-            self.add_custom_param()
+           
 # 新增：模块4指数膨胀变形参数对话框
 class Module4ExpansionDialog(QDialog):
     """模块4指数膨胀变形参数对话框"""
@@ -1891,7 +1858,9 @@ class MainWindow(QMainWindow):
         # 右侧图形显示区（原有部分不修改）
         right_panel = QWidget()
         right_layout = QVBoxLayout(right_panel)
-
+        # 保存上一次用户自定义公式
+        self.last_custom_x_expr = "x + 0.5*sin(0.4*x)"
+        self.last_custom_y_expr = "y"
 
         # 创建画布
         self.canvas = MplCanvas(self, width=10, height=8, dpi=100)
@@ -2012,43 +1981,37 @@ class MainWindow(QMainWindow):
                 try:
                     with open(style_file, "r", encoding=encoding) as f:
                         style_content = f.read()
-                        print(f"✅ 使用 {encoding} 编码成功读取样式表")
+                        print(f"Successfully read the stylesheet")
                         
                         # 检查文件内容是否为空
                         if not style_content.strip():
-                            print("⚠️ 警告: 样式表文件为空")
                             continue
                         
                         # 应用样式表
                         self.setStyleSheet(style_content)
-                        print("🎉 现代化样式表加载成功！")
+                        print("Stylesheet loaded successfully.")
                         return
                         
                 except UnicodeDecodeError:
-                    print(f"❌ {encoding} 编码失败，尝试下一种编码")
                     continue
                 except Exception as e:
-                    print(f"❌ 读取文件时出错 ({encoding}): {e}")
                     continue
             
-            print("❌ 所有编码方式都失败了")
             
         except Exception as e:
-            print(f"❌ 加载样式表时发生未知错误: {e}")
             import traceback
             traceback.print_exc()
-    # ------------------- 原有方法（不修改） -------------------
+    # ------------------- 原有方法 -------------------
     def update_buttons_state(self):
-        """更新按钮状态（修改后）"""
+        """更新按钮状态"""
         has_base = self.base_points is not None
         # 周期性变形按钮
         self.preset_btn.setEnabled(has_base)
         self.custom_btn.setEnabled(has_base)
         
-        # 其他按钮状态保持不变...
+        # 其他按钮状态保持不变
         self.type1_widget.select_region_btn.setEnabled(has_base)
         
-        # 模块4按钮状态
         # 模块4按钮状态
         self.module4_activate_btn.setEnabled(has_base)
         self.module4_deform_combo.setEnabled(self.module4_regions_info is not None and len(self.module4_regions_info) > 0)
@@ -2458,16 +2421,21 @@ class MainWindow(QMainWindow):
                 QMessageBox.information(self, "Success", "Base pattern generated successfully!")
                 self.add_log(f"Generated base pattern: d={params['d']}, axial={params['width']}, circumferential={params['length']}, cycles={params['max_cycles']}")
     def show_periodic_dialog(self, mode):
-        """显示周期性变形参数对话框（修改后）"""
         if not self.base_points:
             QMessageBox.warning(self, "Warning", "Please generate base pattern first!")
             return
             
-        # 固定变形维度为双向变形
         deform_dimension = "both"
         
-        # 创建对话框时传入模式参数
-        dialog = PeriodicFunctionDialog(deform_dimension, mode, self)
+        if mode == "preset":
+            dialog = PeriodicFunctionDialog(deform_dimension, mode, self)
+        else:
+            dialog = PeriodicFunctionDialog(
+                deform_dimension, mode, self,
+                default_x_expr=self.last_custom_x_expr,
+                default_y_expr=self.last_custom_y_expr
+            )
+        
         if dialog.exec_():
             params = dialog.get_params()
             if params:
@@ -2480,42 +2448,39 @@ class MainWindow(QMainWindow):
                 self.deform_history.append(current_state)
                 self.undo_btn.setEnabled(True)
                 
-                # 添加基础参数
                 params["length"] = self.base_params["length"]
                 params["width"] = self.base_params["width"]
                 
                 try:
-                    # 计算变形
                     deformed_points, _ = deform_type4_periodic(self.base_points, params)
-                    # 生成展开路径和3D投影
                     unfolded = StentUtils.generate_unfolded_path(self.base_points, deformed_points, self.base_params)
                     cylinder_3d = StentUtils.project_to_cylinder(unfolded, self.base_params)
                     
-                    # 更新当前变形点集
                     self.current_deformed_points = deformed_points
-                    # 重置区域选择
                     self.type1_selected_region = None
                     self.type1_canvas_interaction.clear_selection()
                     self.update_buttons_state()
                     
-                    # 绘图
                     title = f"Periodic Deformation - {mode.capitalize()} Mode"
                     self.plot_results(self.base_points, deformed_points, title, unfolded, cylinder_3d)
-
-                    # 🔴 新增：更新放大窗口（如果存在）
+                    
+                    # 如果是 custom 模式，保存用户输入的表达式
+                    if mode == "custom":
+                        self.last_custom_x_expr = dialog.x_expr_input.text()
+                        self.last_custom_y_expr = dialog.y_expr_input.text()
+                    
+                    self.add_log(f"Applied periodic deformation ({mode}): {params.get('func_template_id', 'custom')}, periods={params['periodic_n']}")
+                    
                     if hasattr(self, 'zoom_window') and self.zoom_window and self.zoom_window.isVisible():
                         self.zoom_window.update_data(
                             self.base_points,
-                            self.current_deformed_points,
+                            self.current_deformed_points, 
                             self.base_params,
                             self.type1_selected_region,
                             self.module4_regions_info
                         )
-                     # 🔴 取消注释并添加日志
-                    self.add_log(f"Applied periodic deformation ({mode}): {params.get('func_template_id', 'custom')}, periods={params['periodic_n']}")
                 except Exception as e:
                     QMessageBox.critical(self, "Deformation Error", f"Failed to compute deformation: {str(e)}")
-
     def on_undo_deform(self):
         """撤销上一次变形操作（增强格式检查）"""
         if not self.deform_history:
@@ -4653,7 +4618,7 @@ class MainWindow(QMainWindow):
     def export_deformed_absolute(self):
         """导出deformed path的绝对坐标"""
         absolute_points = self.get_current_deformed_path_absolute()
-        if not absolute_points:
+        if absolute_points is None or len(absolute_points) == 0:
             QMessageBox.warning(self, "Warning", "No deformed path data to export!")
             return
         
@@ -4672,7 +4637,7 @@ class MainWindow(QMainWindow):
             success = GCodeExporter.export_points_to_txt(absolute_points, filename, "absolute")
             if success:
                 QMessageBox.information(self, "Success", f"Absolute coordinates exported to {filename}")
-                self.add_log("Exported deformed path (absolute coordinates)")  # 添加这行
+                self.add_log("Exported deformed path (absolute coordinates)")  
             else:
                 QMessageBox.critical(self, "Error", "Failed to export coordinates")
 
@@ -4680,7 +4645,7 @@ class MainWindow(QMainWindow):
     def export_deformed_relative(self):
         """导出deformed path的相对坐标"""
         relative_points = self.get_current_deformed_path_relative()
-        if not relative_points:
+        if relative_points is None or len(relative_points) == 0:  
             QMessageBox.warning(self, "Warning", "No deformed path data to export!")
             return
         
